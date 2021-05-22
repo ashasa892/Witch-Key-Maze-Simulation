@@ -7,8 +7,7 @@
 #include <utility>
 #include <stack>
 #include <queue>
-
-		
+	
 
 #define GAME_NAME "Maze Simulator" 
 #define SCREEN_WIDTH 1280 // height of the game window  (change in Map.h)

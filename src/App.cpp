@@ -171,7 +171,7 @@ void App::update() {
 		pathLen++;
 	}
 	else{
-		
+		setQuit(true);
 	}
 	player.xpos = curx, player.ypos = cury;
 }
@@ -203,7 +203,6 @@ void App::render() {
 	}
 	render(&player);
 	SDL_RenderPresent(renderer);
-	SDL_Delay(60);
 }
 
 

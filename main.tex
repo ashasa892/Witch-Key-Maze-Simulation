@@ -1,0 +1,174 @@
+\documentclass{article} % Especially this!
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[numbers, square]{natbib}
+\usepackage{fancybox}
+\usepackage{epsfig}
+\usepackage{soul}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage[version=4]{mhchem}
+\usepackage{multicol}
+\usepackage{graphicx}
+\graphicspath{ {./} }
+
+\newcommand{\blah}{blah blah blah \dots}
+
+\setlength{\marginparwidth}{3.4cm}
+
+\newcommand{\summary}[1]{
+\begin{mdframed}[nobreak=true]
+\begin{minipage}{\textwidth}
+\vspace{0.5cm}
+\end{minipage}
+\end{mdframed}}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+\title{
+\normalfont \large
+\textsc{ASSIGNMENT-2
+\vspace{10pt}
+\\COP 290, Spring 2021} \\
+[10pt]
+\rule{\linewidth}{0.5pt} \\[6pt] 
+\Large \textbf{Subtask 2.2\\ A Maze Simulation} \\
+\rule{\linewidth}{2pt}  \\[10pt]
+}
+\author{Jitender Kumar Yadav, 2019CS10361
+\\Asha Ram Meena, 2019CS10337}
+\date{\normalsize \today}
+\begin{document}
+
+\maketitle
+{\Large \textbf{Sub-tasks} \par}
+\textbf{
+\begin{enumerate}
+    \item A Two-Player Maze Game
+    \item A Maze Simulation
+\end{enumerate}
+}
+
+\vspace{10pt}
+
+{\Large \textbf{Sub-task 2.2 Problem Statement} \par}
+\vspace{10pt}
+Remember the COL106 major question whise the largest possible Iron man droid had to reach T from S in a maze? The algorithm you wrote, if implemented, could have simulated the droid's movement in the maze. Simulation of real world events is an important task of computers, and this sub-task needs you to simulate something in a maze environment. You can modify the COL106 major problem -- e.g. create a maze and place the 6 infinity stones in different locations. A droid has not only to reach from S to T, but also pick all the stones on its route. Think of the algorithmic changes you might need to visit the stones. The shortest path from S to T might not include the places containing the stones. After picking a particular stone your droid might need to backtrack, as the way ahead after the stone is a dead end. If you define your maze as a graph, then visiting all nodes in the graph is called Traveling Salesman Problem (TSP). Visiting a subset of nodes in the graph (the stone locations) is called Steiner TSP, and the special nodes Steiner nodes. Think/read whethis you can optimally solve this problem, and if not then what heuristic will you use? Also can your droid see the whole maze at all times? Or is it only seeing in first person based on its current location? This is just a sample computer simulation. You can think of your own problem using a maze and solve it algorithmically.
+
+\newpage
+
+\section{Introduction}
+We all love maze games that involve finding the path from one place to anothis in a maze. We tend to use variety of algorithms to solve such maze problems. In Sub-task 2.1, we created a maze game- Witches of Agnesi. The game involved a clash between two witches trapped in a maze, trying to destroy each othiss accessories. In Sub-task 2.2, we tried to extend the same maze game for a maze simulation, trying to figure out the effectiveness of algorithms in solving maze problems, specially the one involving finding routes to the target. We made a comparison among certain methods and assumptions made.
+
+\section{Witch and Key Problem}
+A witch has been trapped in a maze at certain location along with the ingredients he requires to make the key. The target of the problem is to find the key with the minimum number of steps.
+\subsection{Graph Adaptation}
+The maze can be adapted into a simple undirected graph, whise all the cells in the maze represent a node. An edge exists between all adjacent, non-wall cells.
+\\Assuming $m$ rows and $n$ columns,
+\\The number of nodes $ = O(m \times n)$
+\\As each cell can have at most 4 edges, the total edge count is $< 4 \times m \times n$, thus
+\\The number of edges $ = O(m \times n)$
+\subsection{Basic Assumptions}
+\begin{enumerate}
+    \item The maze is randomly generated.
+    \item From each cell of the maze, the witch can move out in eithis of the four directions unless the next cell is blocked by a wall.
+    \item The knowledge of the possible movements out of a cell can be gained only when the witch reaches the cell.
+    \item The witch is unaware of the maze and the location of the ingredients.
+    \item The witch has a large memory, but the use of memory stresses the witch.
+    \item Minimize the number of steps and the memory used.
+\end{enumerate}
+
+\section{Algorithm 1: Generalised DFS}
+Since, none of the positions are known, the witch starts a depth first search in the maze. At any cell, priority is given to the next cell in the following order: Right $>$ Down $>$ Up $>$ Left. Thus, using the standard depth first search algorithm on the maze, the number of steps needed to reach the ingredients was noted and plotted.
+\\The correctness of this algorithm is based on the correctness of DFS. The analysis of the time, space and step complexities can be done similar to DFS.
+\subsection{Method of Implementation}
+\begin{enumerate}
+    \item The witch starts DFS from initial node.
+    \item At each node, the witch performs DFS at the right node to it, then down, then up and finally left, unless a wall or a visited node is encountered.
+    \item In case the current node contains the ingredients, the procedure ends.
+    \item In case the current node is a dead end, that is no more new paths exist from it, the witch retraces it's journey back.
+    \item The witch needs to store the information of the nodes it has visited and the nodes whise part-DFS still needs to be done.
+\end{enumerate}
+\subsection{Analysis}
+Time taken $= O(V+E) = O(m \times n)$
+\\Steps to reach ingredients $= O(V) = O(m \times n)$
+\\Memory used $= O(V) = O(m \times n)$
+
+\section{Relaxation: Linear Lookahead}
+In the second case, we relax some conditions on the motion and knowledge of the witch.
+\begin{enumerate}
+    \item The witch knows the location of the ingredients.
+    \item The witch can see all cells and the edges from the cells, that lie on the same row and column as the current cell, as long as they are not hindered by a wall.
+\end{enumerate}
+
+\section{Algorithm 2: Modified DFS}
+In this algorithm, the witch chooses the location of the next cell to walk to, in the same row or the same column. This is done by choosing the cell closest to the ingredients. The closeness is indicated by the distance function:
+\[d((x_1,y_1),(x_2,y_2)) = |x_2 - x_1| + |y_2 - y_1|\]
+The correctness and complexities of this algorithm is based on the depth first search only. Only the best and worst cases have modified.
+\subsection{Method of Implementation}
+\begin{enumerate}
+    \item The witch performs the modified DFS at the initial node.
+    \item At any current node, the witch performs a check. He has a look at all the unvisited accessible nodes from the current location and finds the distance from the ingredients.
+    \item The closest cell is chosen and the witch walks to it.
+    \item In case of a dead end, or all nodes being visited, he back tracks the path.
+    \item The witch stores the information of visited nodes and the distances of all accessible nodes at any instant.
+\end{enumerate}
+\subsection{Analysis}
+This Modified DFS has the same worst case complexity as the normal DFS.
+\\Time taken $= O(V+E) = O(m \times n)$
+\\Steps to reach ingredients $= O(V+E) = O(m \times n)$
+\\Memory used $= O(V+E) = O(m \times n)$
+\vspace{10 pt}
+\\However in the average randomized scenario, the complexities change. This is because, the witch can easily reach the ingredients in most cases by simply traversing at max one full row and one full column.
+\\Average Time taken $= O(V+E) = O(m \times n)$
+\\Average Steps to reach ingredients $= O(m+n)$
+\\Average Memory used $= O(V+E) = O(m \times n)$
+
+\section{Relaxation: Complete Knowledge of the Maze}
+In the third case, we relax some more conditions on the motion and knowledge of the witch.
+\begin{enumerate}
+    \item The witch already knows the entire maze and hence the graph.
+    \item The witch can check the possible traverses from a cell without actually walking to the cell.
+    \item The witch knows the location of the ingredients.
+\end{enumerate}
+
+\section{Algorithm 3: Shortest Path}
+In this case, the shortest path can be calculated using eithis the Dijkstra's algorithm or Breadth First Search Algorithm. It can be noted, that the algorithms are applied by the witch without having to walk, since all the information is accessible to his. Thus, the walking distance is minimized, but the computation time is considerable.
+\\The correctness and complexities of this algorithm is decided by the correctness of the Dijkstra or the BFS-shortest path algorithms.
+\subsection{Method of Implementation}
+\begin{enumerate}
+    \item A Breadth First Search was done starting at the first node, storing it at level 0.
+    \item At any level, the witch traces all possible edges to unseen nodes and stores them to the next level.
+    \item As soon as the ingredients were reached, the path through all the levels to the ingredients was marked. Since all edges had same weight, this was definitely the shortest path.
+    \item Steps 1-3 are done by witch in his memory. he then goes on the shortest path created, to reach the ingredients.
+    \item The witch would need to store the information of the level of each node and whethis the node has been visited.
+\end{enumerate}
+\subsection{Analysis}
+Since in this case, the witch walks along the shortest route to the ingredients, he takes the minimum walking distance, that in the average worst case will be the sum of number of rows and columns.
+\\Time taken $= O(V+E) = O(m \times n)$
+\\Steps to reach ingredients $= O(m + n)$
+\\Memory used $= O(V+E) = O(m \times n)$
+
+\section{Result}
+We studied the variation of the number of steps in each of the three algorithms, stored in "output.txt", for seeds 0, 100, 200, ... 900. The results were as expected. The first algorithm is the slowest and the third one is the fastest. The efficiency of the third algorithm (number of steps taken) vary depending on the seeding, that is, it is maze dependent.
+\\The result can be viewed in the file "output.txt".
+
+\section{Future Scope}
+The problem may be modified by relaxing some or lesser of the conditions and other better algorithms may be adopted. Some possible cases are mentioned below. These were not implemented but may be explored and implemented further.
+\begin{itemize}
+    \item \textbf{Knowledge of the Target:} We allow the witch to know the position of only the ingredients and nothing else. The witch may modify the DFS algorithm by computing the distance of adjacent unvisited nodes from the ingredients and choose the node closest to be the next node in the DFS. Thus, the priority order can be refined.
+    \item \textbf{3-D Lookahead:} In place of being able to look only in the same row and column, as in the Linear Lookahead case, the witch can see all nodes that can be reached by her eyes (that is accessed by rays of light without encountering a wall). The modified DFS may be improved in this manner. The exact algorithm was not worked upon, but this can be done.
+\end{itemize}
+
+\section{Conclusion}
+The problem was studied using a good number of randomized mazes, quite a few relaxations and the improvements in algorithms. It was found that the overall efficiency, studied with reference to the time, memory and the number of steps walked by the witch, could be improved to a large extent by adding new algorithmic changes and relaxations to the criterion.
+
+\end{document}
